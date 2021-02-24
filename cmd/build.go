@@ -19,10 +19,9 @@ package cmd
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/qiniu/goc/pkg/build"
 	"github.com/qiniu/goc/pkg/cover"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
