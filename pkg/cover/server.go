@@ -28,6 +28,7 @@ import (
 	"regexp"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/tools/cover"
 	"k8s.io/test-infra/gopherage/pkg/cov"
@@ -78,9 +79,18 @@ func (s *server) Route(w io.Writer) *gin.Engine {
 	if w != nil {
 		gin.DefaultWriter = w
 	}
+
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	r := gin.Default()
 	// api to show the registered services
 	r.StaticFile("static", "./"+s.PersistenceFile)
+	r.GET("/", func(ctx *gin.Context) {
+		http.StripPrefix("/", http.FileServer(statikFS)).ServeHTTP(ctx.Writer, ctx.Request)
+	})
 
 	v1 := r.Group("/v1")
 	{
@@ -270,10 +280,13 @@ func skipProfile(skipFile []string, profiles []*cover.Profile) ([]*cover.Profile
 
 func (s *server) clear(c *gin.Context) {
 	var body ProfileParam
+	//var dt, _ = c.GetRawData()
+	//fmt.Println(string(dt))
 	if err := c.ShouldBind(&body); err != nil {
 		c.JSON(http.StatusExpectationFailed, gin.H{"error": err.Error()})
 		return
 	}
+
 	svrsUnderTest := s.Store.GetAll()
 	filterAddrList, err := filterAddrs(body.Service, body.Address, true, svrsUnderTest)
 	if err != nil {

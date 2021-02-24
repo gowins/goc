@@ -12,6 +12,13 @@ fmt:
 govet-check:
 	go vet ./...
 
+statik:
+	go get -u -v github.com/rakyll/statik
+	go install -v github.com/rakyll/statik
+
+gen:
+	statik -src=./templates
+
 clean:
 	find tests/ -type f -name '*.bak' -delete 
 	find tests/ -type f -name '*.cov' -delete 

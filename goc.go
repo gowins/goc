@@ -17,6 +17,7 @@
 package main
 
 import "github.com/qiniu/goc/cmd"
+import _ "github.com/qiniu/goc/statik"
 
 func main() {
 	cmd.Execute()
