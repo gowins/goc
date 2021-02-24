@@ -9,4 +9,5 @@ func main() {
 	foo.Bar1()
 	foo.Bar2()
 	internal.Hello()
+	select {}
 }

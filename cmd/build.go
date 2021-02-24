@@ -50,6 +50,7 @@ goc build --buildflags="-ldflags '-extldflags -static' -tags='embed kodo'"
 		if err != nil {
 			log.Fatalf("Fail to build: %v", err)
 		}
+
 		runBuild(args, wd)
 	},
 }

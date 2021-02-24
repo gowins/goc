@@ -64,12 +64,18 @@ func NewBuild(buildflags string, args []string, workingDir string, outputDir str
 	if err := checkParameters(args, workingDir); err != nil {
 		return nil, err
 	}
+
+	pkg := strings.Join(args, " ")
+	workingDir = filepath.Join(workingDir, filepath.Dir(pkg))
+	pkg = "."
+
 	// buildflags = buildflags + " -o " + outputDir
 	b := &Build{
 		BuildFlags: buildflags,
-		Packages:   strings.Join(args, " "),
+		Packages:   pkg,
 		WorkingDir: workingDir,
 	}
+
 	if false == b.validatePackageForBuild() {
 		log.Errorln(ErrWrongPackageTypeForBuild)
 		return nil, ErrWrongPackageTypeForBuild
