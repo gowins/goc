@@ -65,14 +65,10 @@ func NewBuild(buildflags string, args []string, workingDir string, outputDir str
 		return nil, err
 	}
 
-	pkg := strings.Join(args, " ")
-	workingDir = filepath.Join(workingDir, filepath.Dir(pkg))
-	pkg = "."
-
 	// buildflags = buildflags + " -o " + outputDir
 	b := &Build{
 		BuildFlags: buildflags,
-		Packages:   pkg,
+		Packages:   strings.Join(args, " "),
 		WorkingDir: workingDir,
 	}
 
@@ -156,7 +152,10 @@ func (b *Build) validatePackageForBuild() bool {
 	if b.Packages == "." || b.Packages == "" {
 		return true
 	}
-	return false
+
+	// 指定编译目录
+	b.Packages = filepath.Join(filepath.Dir(b.Packages), "*")
+	return true
 }
 
 func checkParameters(args []string, workingDir string) error {
