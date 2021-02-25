@@ -10,7 +10,7 @@ fmt:
 	go fmt ./...
 
 build:
-	 go build -ldflags "-X 'main.center=http://127.0.0.1:7777'" .
+	 go build -ldflags "-X 'cmd.center=http://127.0.0.1:7777'" .
 
 govet-check:
 	go vet ./...
