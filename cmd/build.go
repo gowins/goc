@@ -83,6 +83,7 @@ func runBuild(args []string, wd string) {
 		OneMainPackage:           true, // it is a go build
 		GlobalCoverVarImportPath: gocBuild.GlobalCoverVarImportPath,
 	}
+
 	err = cover.Execute(ci)
 	if err != nil {
 		log.Fatalf("Fail to build: %v", err)

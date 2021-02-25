@@ -61,6 +61,10 @@ type Build struct {
 // NewBuild creates a Build struct which can build from goc temporary directory,
 // and generate binary in current working directory
 func NewBuild(buildflags string, args []string, workingDir string, outputDir string) (*Build, error) {
+	if len(args) > 1 {
+		args = args[:1]
+	}
+
 	if err := checkParameters(args, workingDir); err != nil {
 		return nil, err
 	}
@@ -79,6 +83,7 @@ func NewBuild(buildflags string, args []string, workingDir string, outputDir str
 	if err := b.MvProjectsToTmp(); err != nil {
 		return nil, err
 	}
+
 	dir, err := b.determineOutputDir(outputDir)
 	b.Target = dir
 	if err != nil {
@@ -155,6 +160,9 @@ func (b *Build) validatePackageForBuild() bool {
 
 	// 指定编译目录
 	b.Packages = filepath.Join(filepath.Dir(b.Packages), "*")
+	if strings.TrimSpace(b.Packages) == "*" {
+		b.Packages = "."
+	}
 	return true
 }
 

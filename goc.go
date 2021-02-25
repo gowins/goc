@@ -30,6 +30,7 @@ func main() {
 	// 判断build模式
 	if len(os.Args) > 1 && os.Args[1] == "build" {
 		var args []string
+		var goArgs []string
 		var args1 []string
 		args = append(args, os.Args[:2]...)
 
@@ -50,14 +51,21 @@ func main() {
 				continue
 			}
 
+			if strings.HasSuffix(arg, ".go") {
+				goArgs = append(goArgs, arg)
+				continue
+			}
+
 			args1 = append(args1, arg)
 		}
 
-		args = append(args, "--buildflags")
-		args = append(args, fmt.Sprintf(`%s`, strings.Join(args1[:len(args1)-1], " ")))
-		if args1 != nil && len(args1) > 0 {
-			args = append(args, args1[len(args1)-1])
+		if len(args1) > 0 {
+			args = append(args, "--buildflags")
+			args = append(args, fmt.Sprintf(`%s`, strings.Join(args1[:len(args1)-1], " ")))
 		}
+
+		args = append(args, goArgs...)
+
 		os.Args = args
 	}
 

@@ -146,7 +146,7 @@ func Execute(coverInfo *CoverInfo) error {
 	target := coverInfo.Target
 	newGopath := coverInfo.GoPath
 	// oneMainPackage := coverInfo.OneMainPackage
-	args := coverInfo.Args
+	//args := coverInfo.Args
 	mode := coverInfo.Mode
 	agentPort := coverInfo.AgentPort
 	center := coverInfo.Center
@@ -163,9 +163,10 @@ func Execute(coverInfo *CoverInfo) error {
 		return ErrCoverPkgFailed
 	}
 	listArgs := []string{"-json"}
-	if len(args) != 0 {
-		listArgs = append(listArgs, args)
-	}
+	//if len(args) != 0 {
+	//	listArgs = append(listArgs, args)
+	//}
+
 	listArgs = append(listArgs, "./...")
 	pkgs, err := ListPackages(target, strings.Join(listArgs, " "), newGopath)
 	if err != nil {
@@ -235,7 +236,7 @@ func ListPackages(dir string, args string, newgopath string) (map[string]*Packag
 	out, err := cmd.Output()
 	if err != nil {
 		log.Errorf("excute `go list -json ./...` command failed, err: %v, stdout: %v, stderr: %v", err, string(out), errbuf.String())
-		return nil, fmt.Errorf("excute `go list -json ./...` command failed, err: %v, stdout: %v, stderr: %v", err, string(out), errbuf.String())
+		return nil, fmt.Errorf("excute `go list -json ./...` command failed,args:%v, err: %v, stdout: %v, stderr: %v", args, err, string(out), errbuf.String())
 	}
 
 	log.Infof("\n%v", errbuf.String())

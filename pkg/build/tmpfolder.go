@@ -33,9 +33,9 @@ import (
 // MvProjectsToTmp moves the projects into a temporary directory
 func (b *Build) MvProjectsToTmp() error {
 	listArgs := []string{"-json"}
-	if len(b.BuildFlags) != 0 {
-		listArgs = append(listArgs, b.BuildFlags)
-	}
+	//if len(b.BuildFlags) != 0 {
+	//	listArgs = append(listArgs, b.BuildFlags)
+	//}
 	listArgs = append(listArgs, "./...")
 	var err error
 	b.Pkgs, err = cover.ListPackages(b.WorkingDir, strings.Join(listArgs, " "), "")
