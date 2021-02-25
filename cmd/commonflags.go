@@ -39,7 +39,7 @@ var (
 )
 
 func getCenter() string {
-	var addr = "http://goc.wpt.la"
+	var addr = "http://127.0.0.1:7777"
 	if e := os.Getenv(gocCenterEnv); e != "" {
 		addr = e
 	}

@@ -35,7 +35,10 @@ func main() {
 		args = append(args, os.Args[:2]...)
 
 		var outIndex = -1
+		var centerIndex = -1
 		for i, arg := range os.Args[2:] {
+			arg = strings.TrimSpace(arg)
+
 			if strings.Contains(arg, " ") {
 				arg = fmt.Sprintf("\"%s\"", arg)
 			}
@@ -51,6 +54,21 @@ func main() {
 				continue
 			}
 
+			if strings.HasPrefix(arg, "--center") {
+				args = append(args, arg)
+
+				if !strings.Contains(arg, "=") {
+					centerIndex = i + 1
+				}
+
+				continue
+			}
+
+			if centerIndex == i {
+				args = append(args, arg)
+				continue
+			}
+
 			if strings.HasSuffix(arg, ".go") {
 				goArgs = append(goArgs, arg)
 				continue
@@ -61,7 +79,7 @@ func main() {
 
 		if len(args1) > 0 {
 			args = append(args, "--buildflags")
-			args = append(args, fmt.Sprintf(`%s`, strings.Join(args1[:len(args1)-1], " ")))
+			args = append(args, fmt.Sprintf(`%s`, strings.Join(args1, " ")))
 		}
 
 		args = append(args, goArgs...)
