@@ -19,7 +19,6 @@ package cmd
 import (
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -27,7 +26,7 @@ import (
 
 var (
 	target            string
-	center            = getCenter()
+	center            = "http://127.0.0.1:7777"
 	agentPort         AgentPort
 	debugGoc          bool
 	debugInCISyncFile string
@@ -35,17 +34,11 @@ var (
 
 	goRunExecFlag  string
 	goRunArguments string
-	gocCenterEnv   = "GOC_CENTER_ADDR"
 )
 
-func getCenter() string {
-	var addr = "http://goc.wpt.la"
-	if e := os.Getenv(gocCenterEnv); e != "" {
-		addr = e
-	}
-	return addr
+func init() {
+	fmt.Println(center)
 }
-
 var coverMode = CoverMode{
 	mode: "count",
 }

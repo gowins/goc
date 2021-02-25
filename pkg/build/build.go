@@ -97,6 +97,7 @@ func (b *Build) Build() error {
 	log.Infoln("Go building in temp...")
 	// new -o will overwrite  previous ones
 	b.BuildFlags = b.BuildFlags + " -o " + b.Target
+	fmt.Println("/bin/bash", "-c", "go build "+b.BuildFlags+" "+b.Packages)
 	cmd := exec.Command("/bin/bash", "-c", "go build "+b.BuildFlags+" "+b.Packages)
 	cmd.Dir = b.TmpWorkingDir
 	cmd.Stdout = os.Stdout
@@ -159,8 +160,8 @@ func (b *Build) validatePackageForBuild() bool {
 	}
 
 	// 指定编译目录
-	b.Packages = filepath.Join(filepath.Dir(b.Packages), "*")
-	if strings.TrimSpace(b.Packages) == "*" {
+	b.Packages = filepath.Join(filepath.Dir(b.Packages), "*.go")
+	if strings.TrimSpace(b.Packages) == "*.go" {
 		b.Packages = "."
 	}
 	return true
