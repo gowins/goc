@@ -65,6 +65,16 @@ import (
 
 )
 
+var center = getCenter()
+
+func getCenter() string {
+	var addr = {{.Center | printf "%q"}}
+	if e := os.Getenv("GOC_CENTER_ADDR"); e != "" {
+		addr = e
+	}
+	return addr
+}
+
 func init() {
 	go registerHandlers()
 }
@@ -218,7 +228,7 @@ func registerHandlers() {
 
 func registerSelf(address string) ([]byte, error) {
 	selfName := filepath.Base(os.Args[0])
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/cover/register?name=%s&address=%s", {{.Center | printf "%q"}}, selfName, address), nil)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/cover/register?name=%s&address=%s", center, selfName, address), nil)
 	if err != nil {
 		log.Fatalf("http.NewRequest failed: %v", err)
 		return nil, err
@@ -254,7 +264,7 @@ func deregisterSelf(address []string) ([]byte, error) {
         if err != nil {
                 return nil, err
         }
-        req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/cover/remove", {{.Center | printf "%q"}}), bytes.NewReader(jsonBody))
+        req, err := http.NewRequest("POST", fmt.Sprintf("%s/v1/cover/remove", center), bytes.NewReader(jsonBody))
         if err != nil {
                 log.Fatalf("http.NewRequest failed: %v", err)
                 return nil, err

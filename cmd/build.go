@@ -19,10 +19,9 @@ package cmd
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/qiniu/goc/pkg/build"
 	"github.com/qiniu/goc/pkg/cover"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +49,7 @@ goc build --buildflags="-ldflags '-extldflags -static' -tags='embed kodo'"
 		if err != nil {
 			log.Fatalf("Fail to build: %v", err)
 		}
+
 		runBuild(args, wd)
 	},
 }
@@ -83,6 +83,7 @@ func runBuild(args []string, wd string) {
 		OneMainPackage:           true, // it is a go build
 		GlobalCoverVarImportPath: gocBuild.GlobalCoverVarImportPath,
 	}
+
 	err = cover.Execute(ci)
 	if err != nil {
 		log.Fatalf("Fail to build: %v", err)

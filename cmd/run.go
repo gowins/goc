@@ -42,6 +42,11 @@ goc run . [--buildflags] [--exec] [--arguments]
 		if err != nil {
 			log.Fatalf("Fail to build: %v", err)
 		}
+
+		if len(args) > 0 {
+			args = args[:1]
+		}
+
 		gocBuild, err := build.NewBuild(buildFlags, args, wd, buildOutput)
 		if err != nil {
 			log.Fatalf("Fail to run: %v", err)
