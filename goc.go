@@ -25,7 +25,11 @@ import (
 	_ "github.com/qiniu/goc/statik"
 )
 
+var center string
+
 func main() {
+	os.Setenv("GOC_CENTER_ADDR", center)
+
 	// 解析go flag
 	// 判断build模式
 	if len(os.Args) > 1 && os.Args[1] == "build" {
@@ -69,7 +73,7 @@ func main() {
 				continue
 			}
 
-			if strings.HasSuffix(arg, ".go") {
+			if strings.HasSuffix(arg, ".go") || arg == "" || arg == "." || arg == "*.go" {
 				goArgs = append(goArgs, arg)
 				continue
 			}
