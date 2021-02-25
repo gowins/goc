@@ -51,7 +51,7 @@ var (
 )
 
 func init() {
-	registerCmd.Flags().StringVarP(&center, "center", "", "http://127.0.0.1:7777", "cover profile host center")
+	registerCmd.Flags().StringVarP(&center, "center", "", center, "cover profile host center")
 	registerCmd.Flags().StringVarP(&name, "name", "n", "", "service name")
 	registerCmd.Flags().StringVarP(&address, "address", "a", "", "service address")
 	registerCmd.MarkFlagRequired("name")
