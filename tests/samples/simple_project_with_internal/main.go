@@ -10,5 +10,6 @@ func main() {
 	foo.Bar1()
 	foo.Bar2()
 	internal.Hello()
-	time.Sleep(time.Second)
+
+	time.Sleep(time.Minute)
 }

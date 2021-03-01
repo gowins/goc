@@ -233,7 +233,7 @@ func registerSelf(address string) ([]byte, error) {
 		log.Fatalf("http.NewRequest failed: %v", err)
 		return nil, err
 	}
-	req.Header.Set("X-Real-Ip",strings.TrimPrefix(address,"http://"))
+	req.Header.Set("X-Real-Ip",strings.Split(strings.TrimPrefix(address,"http://"),":")[0])
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil && isNetworkError(err) {
