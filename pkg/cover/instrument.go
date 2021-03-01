@@ -233,6 +233,7 @@ func registerSelf(address string) ([]byte, error) {
 		log.Fatalf("http.NewRequest failed: %v", err)
 		return nil, err
 	}
+	req.Header.Set("X-Real-Ip",strings.TrimPrefix(address,"http://"))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil && isNetworkError(err) {
@@ -370,6 +371,7 @@ func getRealHost(ln net.Listener) (host string, err error) {
 			}
 		}
 	}
+
 	if nonLocalIPV4 != "" {
 		host = fmt.Sprintf("%s:%d", nonLocalIPV4, ln.Addr().(*net.TCPAddr).Port)
 	} else {
