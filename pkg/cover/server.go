@@ -139,17 +139,18 @@ func (s *server) registerService(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	host, port, err := net.SplitHostPort(u.Host)
+
+	_, _, err = net.SplitHostPort(u.Host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	realIP := c.ClientIP()
-	if host != realIP {
-		log.Printf("the registered host %s of service %s is different with the real one %s, here we choose the real one", service.Name, host, realIP)
-		service.Address = fmt.Sprintf("http://%s:%s", realIP, port)
-	}
+	//realIP := c.ClientIP()
+	//if host != realIP {
+	//	log.Printf("the registered host %s of service %s is different with the real one %s, here we choose the real one", service.Name, host, realIP)
+	//	service.Address = fmt.Sprintf("http://%s:%s", realIP, port)
+	//}
 
 	address := s.Store.Get(service.Name)
 	if !contains(address, service.Address) {
