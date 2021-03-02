@@ -75,6 +75,13 @@ func getCenter() string {
 	return addr
 }
 
+var cbs []CallbackFunc
+func closeFunc() {
+	for i:=range cbs{
+		cbs[i]()
+	}
+}
+
 func init() {
 	go registerHandlers()
 }
@@ -166,7 +173,8 @@ func registerHandlers() {
 		}
 		deregisterSelf(profileAddrs)
 	}
-	go watchSignal(fn)
+	cbs=append(cbs,fn)
+	// go watchSignal(fn)
 
 	mux := http.NewServeMux()
 	// Coverage reports the current code coverage as a fraction in the range [0, 1].

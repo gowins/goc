@@ -17,6 +17,7 @@
 package build
 
 import (
+	"bytes"
 	"io/ioutil"
 	"path/filepath"
 
@@ -34,6 +35,20 @@ func (b *Build) cpGoModulesProject() {
 			if err := copy.Copy(src, dst, copy.Options{Skip: skipCopy}); err != nil {
 				log.Errorf("Failed to Copy the folder from %v to %v, the error is: %v ", src, dst, err)
 			}
+
+			gfs := append(v.GoFiles, v.CgoFiles...)
+			for i := range gfs {
+				dt, _ := ioutil.ReadFile(filepath.Join(v.Dir, gfs[i]))
+				if bytes.Contains(dt, []byte("func main() {")) {
+					if bytes.Contains(dt, []byte("func main() { defer closeFunc();")) {
+						continue
+					}
+
+					dt = bytes.ReplaceAll(dt, []byte("func main() {"), []byte("func main() { defer closeFunc();"))
+					_ = ioutil.WriteFile(filepath.Join(b.TmpDir, gfs[i]), dt, 0755)
+				}
+			}
+
 			break
 		} else {
 			continue
