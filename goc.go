@@ -69,9 +69,13 @@ func main() {
 				continue
 			}
 
-			if strings.HasSuffix(arg, ".go") || arg == "" || arg == "." || arg == "*.go" {
+			if strings.HasSuffix(arg, ".go") || arg == "." || arg == "*.go" {
 				goArgs = append(goArgs, arg)
 				continue
+			}
+
+			if arg == "" {
+				arg = fmt.Sprintf(`"%s"`, arg)
 			}
 
 			args1 = append(args1, arg)

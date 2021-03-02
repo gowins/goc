@@ -75,6 +75,13 @@ func getCenter() string {
 	return addr
 }
 
+var cbs []CallbackFunc
+func closeFunc() {
+	for i:=range cbs{
+		cbs[i]()
+	}
+}
+
 func init() {
 	go registerHandlers()
 }
@@ -166,7 +173,8 @@ func registerHandlers() {
 		}
 		deregisterSelf(profileAddrs)
 	}
-	go watchSignal(fn)
+	cbs=append(cbs,fn)
+	// go watchSignal(fn)
 
 	mux := http.NewServeMux()
 	// Coverage reports the current code coverage as a fraction in the range [0, 1].
@@ -233,6 +241,7 @@ func registerSelf(address string) ([]byte, error) {
 		log.Fatalf("http.NewRequest failed: %v", err)
 		return nil, err
 	}
+	req.Header.Set("X-Real-Ip",strings.Split(strings.TrimPrefix(address,"http://"),":")[0])
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil && isNetworkError(err) {
@@ -370,6 +379,7 @@ func getRealHost(ln net.Listener) (host string, err error) {
 			}
 		}
 	}
+
 	if nonLocalIPV4 != "" {
 		host = fmt.Sprintf("%s:%d", nonLocalIPV4, ln.Addr().(*net.TCPAddr).Port)
 	} else {

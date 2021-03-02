@@ -34,6 +34,7 @@ func (b *Build) cpGoModulesProject() {
 			if err := copy.Copy(src, dst, copy.Options{Skip: skipCopy}); err != nil {
 				log.Errorf("Failed to Copy the folder from %v to %v, the error is: %v ", src, dst, err)
 			}
+
 			break
 		} else {
 			continue

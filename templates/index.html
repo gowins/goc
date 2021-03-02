@@ -149,6 +149,14 @@
                         </button>
                     </td>
 
+                    <td class="border-dashed border-t border-gray-200 firstName">
+                        <button type="button"
+                                @click="remove(user)"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            删除节点
+                        </button>
+                    </td>
+
                 </tr>
             </template>
 
@@ -180,6 +188,10 @@
                 {
                     'key': 'clear',
                     'value': '清除'
+                },
+                {
+                    'key': 'remove',
+                    'value': '删除节点'
                 }
             ],
 
@@ -204,6 +216,25 @@
 
                 }).then(response => response.text()).then(text => {
                     console.log(text)
+                }).catch(err => {
+                    console.log('请求错误', err);
+                })
+            },
+
+            remove(user) {
+                const url = `/v1/cover/remove`
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        // 'address': [user.address],
+                        'service': [user.name]
+                    })
+
+                }).then(response => response.text()).then(text => {
+                    console.log(text)
+                    location.reload()
                 }).catch(err => {
                     console.log('请求错误', err);
                 })
