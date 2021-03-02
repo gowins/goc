@@ -206,8 +206,7 @@ func (b *Build) findWhereToInstall() (string, error) {
 // Clean clears up the temporary workspace
 func (b *Build) Clean() error {
 	if !viper.GetBool("debug") {
-		fmt.Println(b.TmpDir)
-		//return os.RemoveAll(b.TmpDir)
+		return os.RemoveAll(b.TmpDir)
 	}
 	return nil
 }
