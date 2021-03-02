@@ -371,23 +371,30 @@ func Annotate(name string, mode string, varVar string, globalCoverVarImportPath 
 				if !ok || fn.Name.Name != "main" {
 					continue
 				}
-				if strings.Contains(string(newContent), "defer func(){_=1}();") {
+				if strings.Contains(string(newContent), "defer closeFunc();") {
 					break
 				}
 
-				offset := file.offset(fn.Body.Lbrace) + len(gImportStr) + len(gAtomicStr) + 1
+				var offset int
 
 				newBytes := make([]byte, len(newContent), len(newContent))
 				copy(newBytes, newContent)
+
+				fset := token.NewFileSet()
+				_astFile, _ := parser.ParseFile(fset, name, newContent, parser.ParseComments)
+				for _, v := range _astFile.Decls {
+					fn, ok := v.(*ast.FuncDecl)
+					if !ok || fn.Name.Name != "main" {
+						continue
+					}
+					offset = fset.Position(fn.Body.Lbrace).Offset + 1
+					break
+				}
+
 				bottomhalf := newBytes[offset:]
-
-				fmt.Println(string(newBytes[:offset]))
-				fmt.Println(string(bottomhalf))
-
 				newContent = newContent[:offset]
-				newContent = append(newContent, []byte("defer func(){_=1}();")...)
+				newContent = append(newContent, []byte("defer closeFunc();")...)
 				newContent = append(newContent, bottomhalf...)
-				fmt.Println(string(newContent))
 
 				break
 			}
