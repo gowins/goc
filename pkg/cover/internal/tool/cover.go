@@ -6,6 +6,8 @@ package tool
 
 import (
 	"bytes"
+	"strings"
+
 	// "flag"
 	"fmt"
 	"go/ast"
@@ -347,20 +349,49 @@ func Annotate(name string, mode string, varVar string, globalCoverVarImportPath 
 		file.astFile, _ = parser.ParseFile(fset, name, content, parser.ParseComments)
 		file.edit = NewBuffer(newContent)
 		// add global cover variables import path
-		file.edit.Insert(file.offset(file.astFile.Name.End()),
-			fmt.Sprintf("; import %s %q", ".", globalCoverVarImportPath))
+		gImportStr := fmt.Sprintf("; import %s %q", ".", globalCoverVarImportPath)
+		file.edit.Insert(file.offset(file.astFile.Name.End()), gImportStr)
 
+		var gAtomicStr string
 		if mode == "atomic" {
 			// Add import of sync/atomic immediately after package clause.
 			// We do this even if there is an existing import, because the
 			// existing import may be shadowed at any given place we want
 			// to refer to it, and our name (_cover_atomic_) is less likely to
 			// be shadowed.
-			file.edit.Insert(file.offset(file.astFile.Name.End()),
-				fmt.Sprintf("; import %s %q", atomicPackageName, atomicPackagePath))
+			gAtomicStr = fmt.Sprintf("; import %s %q", atomicPackageName, atomicPackagePath)
+			file.edit.Insert(file.offset(file.astFile.Name.End()), gAtomicStr)
 		}
 
 		newContent = file.edit.Bytes()
+
+		if file.astFile.Name.Name == "main" {
+			for _, v := range file.astFile.Decls {
+				fn, ok := v.(*ast.FuncDecl)
+				if !ok || fn.Name.Name != "main" {
+					continue
+				}
+				if strings.Contains(string(newContent), "defer func(){_=1}();") {
+					break
+				}
+
+				offset := file.offset(fn.Body.Lbrace) + len(gImportStr) + len(gAtomicStr) + 1
+
+				newBytes := make([]byte, len(newContent), len(newContent))
+				copy(newBytes, newContent)
+				bottomhalf := newBytes[offset:]
+
+				fmt.Println(string(newBytes[:offset]))
+				fmt.Println(string(bottomhalf))
+
+				newContent = newContent[:offset]
+				newContent = append(newContent, []byte("defer func(){_=1}();")...)
+				newContent = append(newContent, bottomhalf...)
+				fmt.Println(string(newContent))
+
+				break
+			}
+		}
 	}
 
 	// fd := os.Stdout

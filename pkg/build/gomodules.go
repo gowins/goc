@@ -17,13 +17,11 @@
 package build
 
 import (
-	"bytes"
-	"io/ioutil"
-	"path/filepath"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/tongjingran/copy"
 	"golang.org/x/mod/modfile"
+	"io/ioutil"
+	"path/filepath"
 )
 
 func (b *Build) cpGoModulesProject() {
@@ -36,18 +34,17 @@ func (b *Build) cpGoModulesProject() {
 				log.Errorf("Failed to Copy the folder from %v to %v, the error is: %v ", src, dst, err)
 			}
 
-			gfs := append(v.GoFiles, v.CgoFiles...)
-			for i := range gfs {
-				dt, _ := ioutil.ReadFile(filepath.Join(v.Dir, gfs[i]))
-				if bytes.Contains(dt, []byte("func main() {")) {
-					if bytes.Contains(dt, []byte("func main() { defer closeFunc();")) {
-						continue
-					}
-
-					dt = bytes.ReplaceAll(dt, []byte("func main() {"), []byte("func main() { defer closeFunc();"))
-					_ = ioutil.WriteFile(filepath.Join(b.TmpDir, gfs[i]), dt, 0755)
-				}
-			}
+			//gfs := append(v.GoFiles, v.CgoFiles...)
+			//reg := regexp.MustCompile(`func\s+main\(\s*\)\s+\{`)
+			//for i := range gfs {
+			//	dt, _ := ioutil.ReadFile(filepath.Join(v.Dir, gfs[i]))
+			//	if reg.Match(dt) {
+			//		fmt.Println(string(dt), src, filepath.Join(b.TmpDir, gfs[i]))
+			//		dt = reg.ReplaceAll(dt, []byte("func main() { defer closeFunc();"))
+			//		fmt.Println(string(dt), src, filepath.Join(b.TmpDir, gfs[i]))
+			//		_ = ioutil.WriteFile(filepath.Join(b.TmpDir, gfs[i]), dt, 0755)
+			//	}
+			//}
 
 			break
 		} else {
