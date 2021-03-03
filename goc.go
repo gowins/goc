@@ -43,7 +43,6 @@ func main() {
 				arg = fmt.Sprintf("\"%s\"", arg)
 			}
 
-			// TODO 不带参数-o问题
 			if arg == "-o" {
 				outIndex = i + 1
 				args = append(args, arg)
@@ -55,7 +54,6 @@ func main() {
 				continue
 			}
 
-			// TODO center flag设置未处理
 			if strings.HasPrefix(arg, "--center") {
 				args = append(args, arg)
 
