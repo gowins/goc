@@ -157,6 +157,14 @@
                         </button>
                     </td>
 
+                    <td class="border-dashed border-t border-gray-200 firstName">
+                        <button type="button"
+                                @click="html(user)"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            网页展示
+                        </button>
+                    </td>
+
                 </tr>
             </template>
 
@@ -192,6 +200,10 @@
                 {
                     'key': 'remove',
                     'value': '删除节点'
+                },
+                {
+                    'key': 'html',
+                    'value': '网页展示'
                 }
             ],
 
@@ -199,6 +211,11 @@
             showData: "",
             show(user) {
                 const url = `/v1/cover/profile?name=${user.name}&address=${user.address}`
+                window.open(url, '_blank').location;
+            },
+
+            html(user) {
+                const url = `/v1/cover/profile/html?name=${user.name}&address=${user.address}`
                 window.open(url, '_blank').location;
             },
 

@@ -36,9 +36,6 @@ var (
 	goRunArguments string
 )
 
-func init() {
-	fmt.Println(center)
-}
 var coverMode = CoverMode{
 	mode: "count",
 }

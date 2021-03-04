@@ -59,6 +59,9 @@ import (
 	"strings"
 	"sync/atomic"
 	"syscall"
+	"strconv"
+	"time"
+	"os/exec"
 	"testing"
 
 	_cover {{.GlobalCoverVarImportPath | printf "%q"}}
@@ -77,6 +80,7 @@ func getCenter() string {
 
 var cbs []CallbackFunc
 func closeFunc() {
+	fmt.Println("close callback")
 	for i:=range cbs{
 		cbs[i]()
 	}
@@ -147,6 +151,14 @@ func clearFileCover(counter []uint32) {
 	}
 }
 
+func getCurSrc() string {
+	var cur = os.Getenv("GOC_CODE_SRC")
+	if cur == "" {
+		cur = "/data/src"
+	}
+	return cur
+}
+
 func registerHandlers() {
 	ln, host, err := listen()
 	if err != nil {
@@ -195,6 +207,63 @@ func registerHandlers() {
 			return
 		}
 		fmt.Fprintf(w, "%f", float64(n)/float64(d))
+	})
+
+	mux.HandleFunc("/v1/cover/profile_html", func(resp http.ResponseWriter, r *http.Request) {
+		var w = &strings.Builder{}
+		defer w.Reset()
+
+		fmt.Fprint(w, "mode: {{.Mode}}\n")
+		counters, blocks := loadValues()
+		var active, total int64
+		var count uint32
+		for name, counts := range counters {
+			block := blocks[name]
+			for i := range counts {
+				stmts := int64(block[i].Stmts)
+				total += stmts
+				count = atomic.LoadUint32(&counts[i]) // For -mode=atomic.
+				if count > 0 {
+					active += stmts
+				}
+				_, err := fmt.Fprintf(w, "%s:%d.%d,%d.%d %d %d\n", name,
+					block[i].Line0, block[i].Col0,
+					block[i].Line1, block[i].Col1,
+					stmts,
+					count)
+				if err != nil {
+					fmt.Fprintf(w, "invalid block format, err: %v", err)
+					return
+				}
+			}
+		}
+
+		covPath := filepath.Join(os.TempDir(), strconv.Itoa(time.Now().Second()))
+		defer os.RemoveAll(covPath)
+
+		ioutil.WriteFile(covPath, []byte(w.String()), 0755)
+
+		htmlPath := filepath.Join(os.TempDir(), strconv.Itoa(time.Now().Second()))
+		defer os.RemoveAll(htmlPath)
+
+		cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("go tool cover -html=%s -o %s", covPath, htmlPath))
+		cmd.Dir = getCurSrc()
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		err := cmd.Start()
+		if err != nil {
+			resp.Write([]byte(err.Error()))
+			return
+		}
+
+		if err = cmd.Wait(); err != nil {
+			resp.Write([]byte(err.Error()))
+			return
+		}
+
+		dt, _ := ioutil.ReadFile(htmlPath)
+		resp.Write(dt)
 	})
 
 	// coverprofile reports a coverage profile with the coverage percentage

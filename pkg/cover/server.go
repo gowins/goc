@@ -96,6 +96,7 @@ func (s *server) Route(w io.Writer) *gin.Engine {
 	{
 		v1.POST("/cover/register", s.registerService)
 		v1.GET("/cover/profile", s.profile)
+		v1.GET("/cover/profile/html", s.profileHtml)
 		v1.POST("/cover/profile", s.profile)
 		v1.POST("/cover/clear", s.clear)
 		v1.POST("/cover/init", s.initSystem)
@@ -139,17 +140,18 @@ func (s *server) registerService(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	host, port, err := net.SplitHostPort(u.Host)
+
+	_, _, err = net.SplitHostPort(u.Host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	realIP := c.ClientIP()
-	if host != realIP {
-		log.Printf("the registered host %s of service %s is different with the real one %s, here we choose the real one", service.Name, host, realIP)
-		service.Address = fmt.Sprintf("http://%s:%s", realIP, port)
-	}
+	//realIP := c.ClientIP()
+	//if host != realIP {
+	//	log.Printf("the registered host %s of service %s is different with the real one %s, here we choose the real one", service.Name, host, realIP)
+	//	service.Address = fmt.Sprintf("http://%s:%s", realIP, port)
+	//}
 
 	address := s.Store.Get(service.Name)
 	if !contains(address, service.Address) {
@@ -161,6 +163,24 @@ func (s *server) registerService(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"result": "success"})
 	return
+}
+
+func (s *server) profileHtml(c *gin.Context) {
+	var addr = c.Query("address")
+	if addr == "" {
+		c.String(http.StatusBadRequest, "[address] query param is null")
+		return
+	}
+
+	pp, err := NewWorker(addr).ProfileHtml(ProfileParam{})
+	if err != nil {
+		c.JSON(http.StatusExpectationFailed, gin.H{"error": fmt.Sprintf("failed to get profile from %s, error %s", addr, err.Error())})
+		return
+	}
+
+	c.Data(200, "text/html", pp)
+	return
+
 }
 
 // profile API examples:
@@ -363,7 +383,7 @@ func contains(arr []string, str string) bool {
 
 // filterAddrs filter address list by given service and address list
 func filterAddrs(serviceList, addressList []string, force bool, allInfos map[string][]string) (filterAddrList []string, err error) {
-	addressAll := []string{}
+	var addressAll []string
 	for _, addr := range allInfos {
 		addressAll = append(addressAll, addr...)
 	}

@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/qiniu/goc/pkg/build"
@@ -45,6 +46,8 @@ goc build --output /to/this/path
 goc build --buildflags="-ldflags '-extldflags -static' -tags='embed kodo'"
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(center)
+
 		wd, err := os.Getwd()
 		if err != nil {
 			log.Fatalf("Fail to build: %v", err)
