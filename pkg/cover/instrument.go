@@ -166,8 +166,13 @@ func registerHandlers() {
 	}
 	
 	profileAddr := "http://" + host
-	if resp, err := registerSelf(profileAddr); err != nil {
-		log.Fatalf("register address %v failed, err: %v, response: %v", profileAddr, err, string(resp))
+	for {
+		if resp, err := registerSelf(profileAddr); err != nil {
+			log.Printf("register address %v failed, err: %v, response: %v", profileAddr, err, string(resp))
+			time.Sleep(time.Second*2)
+			continue
+		}
+		break
 	}
 
 	fn := func() {

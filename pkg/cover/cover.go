@@ -225,7 +225,7 @@ func Execute(coverInfo *CoverInfo) error {
 // ListPackages list all packages under specific via go list command
 // The argument newgopath is if you need to go list in a different GOPATH
 func ListPackages(dir string, args string, newgopath string) (map[string]*Package, error) {
-	cmd := exec.Command("/bin/bash", "-c", "go list "+args)
+	cmd := exec.Command("/bin/bash", "-c", "go mod vendor && go list "+args)
 	log.Printf("go list cmd is: %v", cmd.Args)
 	cmd.Dir = dir
 	if newgopath != "" {
