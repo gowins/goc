@@ -245,8 +245,8 @@
                     method: "POST",
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        // 'address': [user.address],
-                        'service': [user.name]
+                        'address': [user.address],
+                        // 'service': [user.name]
                     })
 
                 }).then(response => response.text()).then(text => {
